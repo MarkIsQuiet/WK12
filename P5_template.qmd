@@ -1,0 +1,294 @@
+---
+title: "Client Report - The War with Star Wars"
+subtitle: "Course DS 250"
+author: "Mark Rowley"
+format:
+  html:
+    self-contained: true
+    page-layout: full
+    title-block-banner: true
+    toc: true
+    toc-depth: 3
+    toc-location: body
+    number-sections: false
+    html-math-method: katex
+    code-fold: true
+    code-summary: "Show the code"
+    code-overflow: wrap
+    code-copy: hover
+    code-tools:
+        source: false
+        toggle: true
+        caption: See code
+execute: 
+  warning: false
+    
+---
+
+```{python}
+import pandas as pd 
+import numpy as np
+from lets_plot import *
+# add the additional libraries you need to import for ML here
+
+LetsPlot.setup_html(isolated_frame=True)
+```
+
+
+```{python}
+# Learn morea about Code Cells: https://quarto.org/docs/reference/cells/cells-jupyter.html
+
+# Include and execute your code here
+
+# import your data here using pandas and the URL
+df = pd.read_csv("StarWars.csv", encoding="cp1252")
+
+pd.set_option("display.max_rows", None)
+pd.set_option("display.max_columns", None)
+
+df.head()
+print(df.columns)
+```
+
+```{python}
+print(df.iloc[0:2])
+```
+
+## Elevator pitch
+_A SHORT (2-3 SENTENCES) PARAGRAPH THAT `DESCRIBES KEY INSIGHTS` TAKEN FROM METRICS IN THE PROJECT RESULTS THINK TOP OR MOST IMPORTANT RESULTS._ (Note: this is not a summary of the project, but a summary of the results.)
+
+_A Client has requested this analysis and this is your one shot of what you would say to your boss in a 2 min elevator ride before he takes your report and hands it to the client._
+
+## QUESTION|TASK 1
+
+__Shorten the column names and clean them up for easier use with pandas.__ Provide a table or list that exemplifies how you fixed the names. 
+
+_type your results and analysis here_
+
+```{python}
+# Include and execute your code here
+df_nna = df.dropna(how = 'all').copy()
+
+rename_map = {
+    'RespondentID': 'response_id',
+    'Have you seen any of the 6 films in the Star Wars franchise?': 'seen_any_film',
+    'Do you consider yourself to be a fan of the Star Wars film franchise?': 'fan',
+    'Which of the following Star Wars films have you seen? Please select all that apply.': 'seen_episode_1',
+    'Unnamed: 4': 'seen_episode_2', 
+    'Unnamed: 5': 'seen_episode_3', 
+    'Unnamed: 6': 'seen_episode_4', 
+    'Unnamed: 7': 'seen_episode_5', 
+    'Unnamed: 8': 'seen_episode_6',
+    'Please rank the Star Wars films in order of preference with 1 being your favorite film in the franchise and 6 being your least favorite film.': 'episode_1_rank',
+    'Unnamed: 10': 'episode_2_rank', 
+    'Unnamed: 11': 'episode_3_rank', 
+    'Unnamed: 12': 'episode_4_rank', 
+    'Unnamed: 13': 'episode_5_rank',
+    'Unnamed: 14': 'episode_6_rank',
+    'Please state whether you view the following characters favorably, unfavorably, or are unfamiliar with him/her.': 'liked_han_solo',
+    'Unnamed: 16': 'liked_luke_skywalker', 
+    'Unnamed: 17': 'liked_leia_organa', 
+    'Unnamed: 18': 'liked_anakin_skywalker', 
+    'Unnamed: 19': 'liked_obi_wan',
+    'Unnamed: 20': 'liked_palpatine', 
+    'Unnamed: 21': 'liked_darth_vader', 
+    'Unnamed: 22': 'liked_lando', 
+    'Unnamed: 23': 'liked_boba_fett',
+    'Unnamed: 24': 'liked_c3po', 
+    'Unnamed: 25': 'liked_r2d2', 
+    'Unnamed: 26': 'liked_jar_jar', 
+    'Unnamed: 27': 'liked_padme_amidala',
+    'Unnamed: 28': 'liked_yoda', 
+    'Which character shot first?': 'unknown_question',
+    'Are you familiar with the Expanded Universe?': 'know_expanded_universe',
+    'Do you consider yourself to be a fan of the Expanded Universe?Œæ': 'fan_expanded_universe',
+    'Do you consider yourself to be a fan of the Star Trek franchise?': 'fan_star_trek',
+    'Gender': 'gender', 'Age': 'age', 'Household Income': 'income', 'Education': 'education',
+    'Location (Census Region)': 'region'
+}
+
+df_nna = df_nna.rename(columns=rename_map)
+df_nna = df_nna.drop(0)
+
+print(df_nna.columns)
+
+```
+
+
+## QUESTION|TASK 2
+
+__Clean and format the data so that it can be used in a machine learning model.__ As you format the data, you should complete each item listed below. In your final report provide example(s) of the reformatted data with a short description of the changes made.  
+    a. Filter the dataset to respondents that have seen at least one film  
+    b. Create a new column that converts the age ranges to a single number. Drop the age range categorical column  
+    c. Create a new column that converts the education groupings to a single number. Drop the school categorical column  
+    d. Create a new column that converts the income ranges to a single number. Drop the income range categorical column  
+    e. Create your target (also known as “y” or “label”) column based on the new income range column  
+    f. One-hot encode all remaining categorical columns   
+
+_type your results and analysis here_
+
+```{python}
+# Include and execute your code here
+  # Part A
+df_clean = df_nna.copy()
+```
+
+```{python}
+# Include and execute your code here
+  # Part A
+seen_a_film = ['seen_episode_1', 'seen_episode_2', 'seen_episode_3', 'seen_episode_4', 'seen_episode_5', 'seen_episode_6']
+
+df_clean = df_clean.dropna(subset = seen_a_film, how = 'all')
+print(df_clean.columns)
+```
+
+```{python}
+# Include and execute your code here
+  # Part B
+age_group = {
+  '18-29': '1',
+  '30-44': '2',
+  '45-60': '3',
+  '> 60': '4'
+}
+
+df_clean['age_group'] = df_clean['age'].map(age_group)
+df_clean['age_group'] = df_clean['age_group'].fillna("Unknown")
+df_clean.drop("age", axis=1, inplace=True)
+print(df_clean.columns)
+```
+
+```{python}
+# Include and execute your code here
+  # Part C
+education_level = {
+  'Less than high school degree': '1',
+  'High school degree': '2',
+  'Some college or Associate degree': '3',
+  'Bachelor degree': '4'
+}
+
+df_clean['education_level'] = df_clean['education'].map(education_level)
+df_clean['education_level'] = df_clean['education_level'].fillna("Unknown")
+df_clean.drop("education", axis=1, inplace=True)
+print(df_clean['education_level'].unique())
+print(df_clean.columns)
+
+```
+
+```{python}
+# Include and execute your code here
+  # Part D
+income_level = {
+  '$0 - $24,999': '1',
+  '$25,000 - $49,999': '2',
+  '$50,000 - $99,999': '3',
+  '$100,000 - $149,999': '4',
+  '$150,000+': '5'
+}
+
+df_clean['income_level'] = df_clean['income'].map(income_level)
+df_clean['income_level'] = df_clean['income_level'].fillna("Unknown")
+df_clean.drop("income", axis=1, inplace=True)
+print(df_clean['income_level'].unique())
+print(df_clean.columns)
+```
+
+```{python}
+# Include and execute your code here
+df_clean['target'] = df_clean['income_level']
+
+df_clean.drop(df_clean[df_clean['target'] == "Unknown"].index, inplace=True)
+print(df_clean.iloc[0:6])
+
+```
+
+```{python}
+# Include and execute your code here
+
+categorical_cols = [
+    'seen_any_film', 'fan', 'seen_episode_1', 'seen_episode_2', 'seen_episode_3',
+    'seen_episode_4', 'seen_episode_5', 'seen_episode_6',
+    'episode_1_rank', 'episode_2_rank', 'episode_3_rank',
+    'episode_4_rank', 'episode_5_rank', 'episode_6_rank',
+    'liked_han_solo', 'liked_luke_skywalker', 'liked_leia_organa',
+    'liked_anakin_skywalker', 'liked_obi_wan', 'liked_palpatine',
+    'liked_darth_vader', 'liked_lando', 'liked_boba_fett',
+    'liked_c3po', 'liked_r2d2', 'liked_jar_jar',
+    'liked_padme_amidala', 'liked_yoda', 'unknown_question',
+    'know_expanded_universe', 'fan_expanded_universe', 'fan_star_trek',
+    'gender', 'region'
+]
+df_encoded = pd.get_dummies(df_clean, columns=categorical_cols, drop_first=False)
+print(df_encoded.columns)
+print(df_encoded.iloc[0:2])
+```
+
+## QUESTION|TASK 3
+
+__Validate that the data provided on GitHub lines up with the article by recreating 2 of the visuals from the article.__  
+
+_type your results and analysis here_
+
+```{python}
+# Include and execute your code here
+
+```
+
+```{python}
+# Include and execute your code here
+
+```
+
+## QUESTION|TASK 4
+
+__Build a machine learning model that predicts whether a person makes more than $50k. Describe your model and report the accuracy.__ 
+
+_type your results and analysis here_
+
+```{python}
+# Include and execute your code here
+
+```
+
+---
+
+## STRETCH QUESTION|TASK 1
+
+__Build a machine learning model that predicts whether a person makes more than $50k. With accuracy of at least 65%. Describe your model and report the accuracy.__
+
+_type your results and analysis here_
+
+```{python}
+# Include and execute your code here
+
+
+```
+
+
+## STRETCH QUESTION|TASK 2
+
+__Validate the data provided on GitHub lines up with the article by recreating a 3rd visual from the article.__
+
+_type your results and analysis here_
+
+```{python}
+# Include and execute your code here
+
+
+```
+
+
+## STRETCH QUESTION|TASK 3
+
+__Create a new column that converts the location groupings to a single number. Drop the location categorical column.__  
+
+_type your results and analysis here_
+
+```{python}
+# Include and execute your code here
+
+
+```
+
+---

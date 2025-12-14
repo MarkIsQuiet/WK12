@@ -1,0 +1,91 @@
+
+```{python}
+# Read in libraries
+import pandas as pd
+import numpy as np
+from lets_plot import *
+LetsPlot.setup_html(isolated_frame=True)
+url = 'https://github.com/fivethirtyeight/data/raw/master/star-wars-survey/StarWars.csv'
+```
+
+
+```{python}
+# Get Data
+df = pd.read_csv("StarWars.csv", encoding="cp1252")
+df.columns
+```
+
+```{python}
+# Get Data
+df = pd.read_csv("StarWars.csv", encoding="cp1252")
+df.columns = df.columns.str.encode('ascii', 'ignore').str.decode('ascii')
+df.columns
+```
+
+```{python}
+df_name = df.dropna(how = "all").copy()
+
+rename_map = {
+    'RespondentID': 'response_id',
+    'Have you seen any of the 6 films in the Star Wars franchise?': 'seen_any_film',
+    'Do you consider yourself to be a fan of the Star Wars film franchise?': 'star_wars_fan',
+    'Which of the following Star Wars films have you seen? Please select all that apply.': 'seen_episode_1',
+    'Unnamed: 4': 'seen_episode_2', 
+    'Unnamed: 5': 'seen_episode_3', 
+    'Unnamed: 6': 'seen_episode_4', 
+    'Unnamed: 7': 'seen_episode_5', 
+    'Unnamed: 8': 'seen_episode_6',
+    'Please rank the Star Wars films in order of preference with 1 being your favorite film in the franchise and 6 being your least favorite film.': 'episode_1_rank',
+    'Unnamed: 10': 'episode_2_rank', 
+    'Unnamed: 11': 'episode_3_rank', 
+    'Unnamed: 12': 'episode_4_rank', 
+    'Unnamed: 13': 'episode_5_rank',
+    'Unnamed: 14': 'episode_6_rank',
+    'Please state whether you view the following characters favorably, unfavorably, or are unfamiliar with him/her.': 'favored_han_solo',
+    'Unnamed: 16': 'favored_luke_skywalker', 
+    'Unnamed: 17': 'favored_leia_organa', 
+    'Unnamed: 18': 'favored_anakin_skywalker', 
+    'Unnamed: 19': 'favored_obi_wan',
+    'Unnamed: 20': 'favored_palpatine', 
+    'Unnamed: 21': 'favored_darth_vader', 
+    'Unnamed: 22': 'favored_lando', 
+    'Unnamed: 23': 'favored_boba_fett',
+    'Unnamed: 24': 'favored_c3po', 
+    'Unnamed: 25': 'favored_r2d2', 
+    'Unnamed: 26': 'favored_jar_jar', 
+    'Unnamed: 27': 'favored_padme_amidala',
+    'Unnamed: 28': 'favored_yoda', 
+    'Which character shot first?': 'unknown_question',
+    'Are you familiar with the Expanded Universe?': 'know_of_expanded_universe',
+    'Do you consider yourself to be a fan of the Expanded Universe?': 'expanded_universe_fan',
+    'Do you consider yourself to be a fan of the Star Trek franchise?': 'star_trek_fan',
+    'Gender': 'gender', 'Age': 'age', 'Household Income': 'income', 'Education': 'education',
+    'Location (Census Region)': 'region'
+}
+
+df_name = df_name.rename(columns=rename_map)
+df_name = df_name.drop(0)
+
+df_name.columns
+```
+
+```{python}
+yes_count = df_name['seen_any_film'].astype(str).str.contains('Yes', na=False).sum()
+print(yes_count)
+print(len(df_name))
+
+print(f"Percentage Seen Film: {yes_count/len(df_name)}")
+```
+
+
+```{python}
+df_male = df_name[df_name['gender'].astype(str).str.contains('Male', na = False)].copy()
+```
+
+```{python}
+yes_count = df_male['seen_any_film'].astype(str).str.contains('Yes', na=False).sum()
+print(yes_count)
+print(len(df_male))
+
+print(f"Percentage Seen Film: {yes_count/len(df_male)}")
+```
